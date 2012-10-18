@@ -21,28 +21,46 @@ var CalendarEvent = db.model('CalendarEvent', schema);
 function getEvent(event_id, callback) {
   console.log('Get ' + event_id); 
   CalendarEvent.findOne({ id: event_id}, function (err, doc){
-    console.log('Document : ' + doc);
-    console.log('Error : ' + err);
-    callback.call(null, doc);
+    console.log('Document : ', doc);
+    console.log('Error : ', err);
+    callback(err, doc);
   });
 }
 
 // Store a calendar event
-function storeEvent(json) {
+function storeEvent(json, callback) {
   console.log('Store ' + json); 
   
-  var calendar_event = new CalendarEvent(json);
-  calendar_event.save(function (err) {
-    if (err) {
-      console.log('Storage error : ' + err);
+  getEvent(json.id, function(err,doc) {
+    console.log("Store err: ",err);
+    console.log("Store doc: ",doc);
+    if ( !doc ) {
+      return onEventMissing();
     }
+    doc.update(json, function(err) {
+      if (err) {
+        console.log('Storage error : ' + err);
+      }
+      callback(err);
+    });
+    
   });
+ 
+  function onEventMissing () {
+    var calendar_event = new CalendarEvent(json);
+    calendar_event.save(function (err) {
+      if (err) {
+        console.log('Storage error : ' + err);
+      }
+      callback(err);
+    });
+  };
 }
 
 // Delete the calendar event
-function deleteEvent(event_id) {
+function deleteEvent(event_id, callback) {
   console.log('Delete ID ' + event_id);
-  CalendarEvent.find({id : event_id}).remove();
+  CalendarEvent.find({id : event_id}).remove(callback);
 }
 
 // exports
