@@ -3,8 +3,21 @@ var express = require('express');
 
 exports = module.exports = function(app) {
   var app1 = express();
+  
+  
+  app.get("/calendar/events", function(req, res){
+    store.getAllEventIds(function(err, docs){
+      console.log('Back!', docs);
+      if ( err ) {
+        return res.status(500).send(err);
+      }
+      res.send(docs);
+    });
+//     res.send("Sending calendar event "+req.params.id);
+  });
+  
   app.get("/calendar/event/:id", function(req, res){
-    store.getEvent(request.params.id, function(err, doc){
+    store.getEvent(req.params.id, function(err, doc){
       console.log('Back!');
       if ( err ) {
         return res.status(500).send(err);

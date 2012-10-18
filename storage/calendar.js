@@ -16,6 +16,16 @@ var schema = mongoose.Schema({
 
 var CalendarEvent = db.model('CalendarEvent', schema);
 
+
+function getAllEventIds (callback) {
+  CalendarEvent.find(function (err, docs){
+    console.log('Documents : ', docs);
+    console.log('Error : ', err);
+    var back = docs.map(function(doc) {return doc.id;});
+    callback(err, back);
+  });
+};
+
 // get the event by ID
 // send back the result to the callback.get(doc) method
 function getEvent(event_id, callback) {
@@ -68,3 +78,4 @@ function deleteEvent(event_id, callback) {
 exports.getEvent = getEvent;
 exports.storeEvent = storeEvent;
 exports.deleteEvent = deleteEvent;
+exports.getAllEventIds = getAllEventIds;

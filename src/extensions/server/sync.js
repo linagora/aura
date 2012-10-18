@@ -1,7 +1,22 @@
-define(['sandbox'], function(sandbox) {
+define(['sandbox', '../../../widgets/calendar/collections/events', 
+       '../../../widgets/calendar/models/event'], 
+       function(sandbox, Events, Event) {
   'use strict';
 
-  console.log("~~~~~~~~~~~~~~~~~~é loading");
+  function getLocalEvents (callback) {
+    var evtCollection = new Events();
+    evtCollection.fetch({
+      success: function(col, events) { 
+        console.log("fetch success",arguments); 
+        callback(null, events);
+      },
+      error: function(err) {
+        console.log("fetch error", arguments);
+        callback(err);
+      }
+    });
+  };
+
 
   var APIROOT="/calendar/event";
   
@@ -56,6 +71,184 @@ define(['sandbox'], function(sandbox) {
     });
   });
 
+  function getServerEventIds (callback) {
+    $.ajax({
+      type: "GET",
+      url: APIROOT+"s",
+      error: function(err) {
+        console.log("Server sync failed");
+        callback(err);
+      },
+      success: function(data) {
+        console.log("Server sync succeded", data);
+        callback(null,data);
+      }
+    });
+  };
+  
+  function getServerEvent(id, callback) {
+    $.ajax({
+      type: "GET",
+      url: APIROOT+"/"+id,
+      error: function(err) {
+        console.log("Server sync failed");
+        callback(err);
+      },
+      success: function(data) {
+        console.log("Server sync succeded", data);
+        callback(null,data);
+      }
+    });
+  };
+  
+  function eventsAreDifferent (ev1, ev2) {
+    var properties=["color","end","start","title"];
+    var different = false;
+    properties.forEach(function(prop) {
+      if ( ev1[prop] != ev2[prop] ) {
+        different = true;
+      }
+    });
+    return different;
+  };
+  
+  function mergeLocalAndRemoteEvents(err, clientEvents, serverEvents) {
+    if ( err ) {
+      return console.log("sync failed: ",err);
+    }
+    var remoteIds = [];
+    var localIds = [];
+    var onlyRemote = [];
+    var onlyLocal = [];
+    var both = [];
+    for (var i in clientEvents ) {
+      localIds.push(i);
+    }
+    for (var i in serverEvents ) {
+      remoteIds.push(i);
+    }
+    remoteIds.forEach(function(id) {
+      if ( localIds.indexOf(id) >= 0 ) {
+        both.push(id);
+      } else {
+        onlyRemote.push(id);
+      }
+    });
+    
+    localIds.forEach(function(id) {
+      if ( remoteIds.indexOf(id) < 0 ) {
+        onlyLocal.push(id);
+      }
+    });
+    
+    console.log("both:",both,"only local: ",onlyLocal,", onlyRemote: ",onlyRemote);
+    
+    var bothAndDifferent = [];
+    both.forEach(function(id) {
+      if ( eventsAreDifferent( clientEvents[id], serverEvents[id] ) ) {
+        bothAndDifferent.push(id);
+      }
+    });
+    
+    console.log("both and different:",bothAndDifferent);
+    if ( onlyRemote.length ) {
+      var id = onlyRemote.pop();
+      var evt = new Event();
+      delete serverEvents[id]._id;
+      delete serverEvents[id].__v;
+      evt.set(serverEvents[id]);
+      var evtCollection = new Events();
+      evtCollection.create(evt, {
+        success: function(){console.log("Remote => local event saved !",arguments);}
+      });
+    }
+    
+  };
+  
+  function getServerEvents(serverIds, callback) {
+    var jobs = [];
+    var events = {};
+    var errors = 0;
+    if ( serverIds.length ) {
+      serverIds.forEach(function(id) {
+        var f = function(then) {
+          getServerEvent(id, then);
+        };
+        jobs.push(f);
+      });
+    }
+    
+    var nextStep = function() {
+      if ( !jobs.length ) {
+        if ( errors) {
+          console.log("encoutered errors while fetching events");
+          callback(errors);
+          return ;
+        }
+        console.log("Got all remote events", events);
+        callback(null, events);
+        return ;
+      }
+      var job = jobs.pop();
+      job(function(err, resp) {
+        if( err ) {
+          errors++;
+        } else {
+          events[resp.id]=resp;
+        }
+        nextStep();
+      });
+    };
+    
+    nextStep();
+    
+    
+    
+  };
+  
+  
+  
+  
+  function syncFromServer () {
+    var responseCount = 2;
+    var serverIds = null;
+    var clientEvents = null;
+    getServerEventIds(function(err,resp) {
+      responseCount--;
+      if ( !err ) {
+        serverIds = resp;
+      }
+      onResponse();
+    });
+    
+    getLocalEvents(function(err,resp) {
+      responseCount--;
+      if ( !err ) {
+        clientEvents = {};
+        resp.forEach(function(e) {clientEvents[e.id] = e;})
+      }
+      onResponse();
+    });
+    
+    function onResponse () {
+      if ( responseCount == 0 ) {
+        if ( serverIds === null ) {
+          console.log("error from server communication");
+          return ;
+        }
+        if ( clientEvents === null ) {
+          console.log("error from local storage");
+          return ;
+        }
+        console.log("OK, got client & server data",clientEvents, serverIds);
+        getServerEvents(serverIds, function(err,serverEvents) {
+          mergeLocalAndRemoteEvents(err, clientEvents, serverEvents);
+        });
+      }
+    };
+  };
+  
+  syncFromServer();
   
   return {};
 
