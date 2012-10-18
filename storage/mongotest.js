@@ -1,5 +1,5 @@
 var express = require('express');
-var store = require('./storage/calendar');
+var store = require('./calendar');
 var app = express();
 
 app.get('/get', function(req, res){
