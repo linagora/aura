@@ -24,6 +24,7 @@ define(['sandbox'], function(sandbox) {
   });
 
   sandbox.on("Event::update","calendar",function(type, evt) { 
+        console.log("Got an event: ",evt.toJSON()); 
     $.ajax({
       contentType: "application/json",
       data: JSON.stringify(evt),
@@ -37,12 +38,24 @@ define(['sandbox'], function(sandbox) {
       }
     });
   });
-/*  
-  sandbox.on("Event::delete","calendar",function(type, evt) { 
+
+  sandbox.on("Event::destroy","calendar",function(type, evt) { 
     console.log("Got an event: ",arguments);
     console.log("Got an event: ",evt.toJSON()); 
+    $.ajax({
+      contentType: "application/json",
+      data: JSON.stringify(evt),
+      type: "DELETE",
+      url: APIROOT+"/"+evt.id,
+      error: function() {
+        console.log("Server sync failed");
+      },
+      success: function() {
+        console.log("Server sync succeded");
+      }
+    });
   });
-  */
+
   
   return {};
 
