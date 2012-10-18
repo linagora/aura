@@ -11,6 +11,9 @@ define(['aura_perms'], function(permissions) {
     },
     calendar: {
       bootstrap: true,
+      "Event::create": true,
+      "Event::update": true,
+      "Event::destroy": true,
       '*': true
     },
     controls: {
