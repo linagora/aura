@@ -73,7 +73,11 @@ require.config({
     localstorage: '../../../extensions/backbone/lib/localstorage',
     fullcalendar: '../../../extensions/backbone/lib/fullcalendar.min',
     jquery_ui: '../../../extensions/backbone/lib/jquery-ui.min',
+    // server synchronization
+    serverSync: '../../../extensions/server/sync',
 
+    
+    
     // Demo App
     perms: '../../../apps/demo/js/permissions'
   }
