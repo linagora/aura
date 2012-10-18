@@ -3,13 +3,13 @@ define(['sandbox', '../models/event'], function(sandbox, Event) {
 
   var storageCallbacks = {
     onCreate: function(name, model) {
-      sandbox.emit("Event::create",model);
+      sandbox.emit("Event::create","calendar",model);
     },
     onUpdate: function(name, model) {
-      sandbox.emit("Event::update",model);
+      sandbox.emit("Event::update","calendar",model);
     },
     onDestroy: function(name, model) {
-      sandbox.emit("Event::destroy",model);
+      sandbox.emit("Event::destroy","calendar",model);
     }
   };
 
