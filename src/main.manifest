@@ -1,5 +1,6 @@
 CACHE MANIFEST
 CACHE:
+http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/base/jquery-ui.css
 config.js
 i18n.js
 index.html
@@ -27,6 +28,7 @@ index.html
 ./extensions/backbone/lib/require.js
 ./extensions/backbone/lib/text.js
 ./extensions/backbone/sandbox.js
+./extensions/server/sync.js
 ./nls/fr-fr/todos.js
 ./nls/todos.js
 ./widgets/boilerplate/main.js
