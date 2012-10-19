@@ -16,8 +16,18 @@ function guid() {
 
 // Our Store is represented by a single JS object in *localStorage*. Create it
 // with a meaningful name, like the name you'd give a table.
-var Store = function(name) {
+var Store = function(name, options) {
+  
+  this.settings = {
+    onSave: function() {},
+    onCreate: function() {},
+    onUpdate: function() {},
+    onDestroy: function() {}
+  };
+  options = options || {};
+  _.extend(this.settings, options);
   this.name = name;
+  
   var store = localStorage.getItem(this.name);
   this.data = (store && JSON.parse(store)) || {};
 };
@@ -27,6 +37,7 @@ _.extend(Store.prototype, {
   // Save the current state of the **Store** to *localStorage*.
   save: function() {
     localStorage.setItem(this.name, JSON.stringify(this.data));
+    this.settings.onSave(this.name, this.data);
   },
 
   // Add a model, giving it a (hopefully)-unique GUID, if it doesn't already
@@ -35,6 +46,7 @@ _.extend(Store.prototype, {
     if (!model.id) model.id = model.attributes.id = guid();
     this.data[model.id] = model;
     this.save();
+    this.settings.onCreate(this.name, model);
     return model;
   },
 
@@ -42,6 +54,7 @@ _.extend(Store.prototype, {
   update: function(model) {
     this.data[model.id] = model;
     this.save();
+    this.settings.onUpdate(this.name, model);
     return model;
   },
 
@@ -59,6 +72,7 @@ _.extend(Store.prototype, {
   destroy: function(model) {
     delete this.data[model.id];
     this.save();
+    this.settings.onDestroy(this.name, model);
     return model;
   }
 

@@ -1,5 +1,50 @@
+var store = require("../storage/calendar");
+var express = require('express');
+
 exports = module.exports = function(app) {
-  app.get('/', function(req, res){
-    res.send('hello world');
+  var app1 = express();
+  
+  
+  app.get("/calendar/events", function(req, res){
+    store.getAllEventIds(function(err, docs){
+      console.log('Back!', docs);
+      if ( err ) {
+        return res.status(500).send(err);
+      }
+      res.send(docs);
+    });
+//     res.send("Sending calendar event "+req.params.id);
   });
+  
+  app.get("/calendar/event/:id", function(req, res){
+    store.getEvent(req.params.id, function(err, doc){
+      console.log('Back!');
+      if ( err ) {
+        return res.status(500).send(err);
+      }
+      res.send(doc);
+    });
+//     res.send("Sending calendar event "+req.params.id);
+  });
+  app1.use(express.bodyParser());
+  app1.put("/calendar/event/:id", function(req, res){
+    store.storeEvent(req.body, function(err) {
+      if ( err ) {
+        return res.status(500).send(err);
+      }
+      res.send(req.body);
+      
+    });
+  });
+  
+  app1.del("/calendar/event/:id", function(req, res){
+    store.deleteEvent(req.params.id,function(err) {
+      if ( err ) {
+        return res.status(500).send(err);
+      }
+      res.send(req.body);
+    });
+  });
+  
+  app.use(app1);
 };
