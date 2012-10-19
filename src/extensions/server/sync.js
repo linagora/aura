@@ -23,7 +23,11 @@ define(['sandbox', '../../../widgets/calendar/collections/events',
   
   sandbox.on("Event::create","calendar",function(type, evt) { 
     console.log("Got an event: ",arguments);
-    console.log("Got an event: ",evt.toJSON()); 
+    console.log("Got an event: ",evt.toJSON());
+    if ( !navigator.onLine ) {
+      console.log("I'm offline, see ya later");
+      return ;
+    }
     $.ajax({
       contentType: "application/json",
       data: JSON.stringify(evt),
@@ -39,7 +43,11 @@ define(['sandbox', '../../../widgets/calendar/collections/events',
   });
 
   sandbox.on("Event::update","calendar",function(type, evt) { 
-        console.log("Got an event: ",evt.toJSON()); 
+    console.log("Got an event: ",evt.toJSON()); 
+    if ( !navigator.onLine ) {
+      console.log("I'm offline, see ya later");
+      return ;
+    }
     $.ajax({
       contentType: "application/json",
       data: JSON.stringify(evt),
@@ -57,6 +65,10 @@ define(['sandbox', '../../../widgets/calendar/collections/events',
   sandbox.on("Event::destroy","calendar",function(type, evt) { 
     console.log("Got an event: ",arguments);
     console.log("Got an event: ",evt.toJSON()); 
+    if ( !navigator.onLine ) {
+      console.log("I'm offline, see ya later");
+      return ;
+    }
     $.ajax({
       contentType: "application/json",
       data: JSON.stringify(evt),
@@ -76,11 +88,11 @@ define(['sandbox', '../../../widgets/calendar/collections/events',
       type: "GET",
       url: APIROOT+"s",
       error: function(err) {
-        console.log("Server sync failed");
+        console.log("Server sync failed (getServerEventIds)");
         callback(err);
       },
       success: function(data) {
-        console.log("Server sync succeded", data);
+        console.log("Server sync succeded (getServerEventIds)", data);
         callback(null,data);
       }
     });
@@ -210,6 +222,10 @@ define(['sandbox', '../../../widgets/calendar/collections/events',
   
   
   function syncFromServer () {
+    if ( !navigator.onLine ) {
+      console.log("I'm offline, see ya later");
+      return ;
+    }
     var responseCount = 2;
     var serverIds = null;
     var clientEvents = null;
@@ -247,6 +263,7 @@ define(['sandbox', '../../../widgets/calendar/collections/events',
       }
     };
   };
+  
   
   syncFromServer();
   
