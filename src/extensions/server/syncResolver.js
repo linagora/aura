@@ -46,9 +46,9 @@ define(["../../../extensions/server/localChanges"], function(localChanges) {
         }
         var localChange = localChanges.getChangeFor(itemSet[0].id);
         if ( localChange ) {
-          changes.shouldSendStore.push(itemSet[0]);
+          changed.shouldSendStore.push(itemSet[0]);
         } else {
-          changed.shouldStore(itemSet[1]);
+          changed.shouldStore.push(itemSet[1]);
         }
       });
       
