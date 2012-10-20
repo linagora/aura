@@ -1,4 +1,4 @@
-define(['sandbox', './views/app', './collections/events', 'fullcalendar'], function(sandbox, AppView, Events) {
+define(['sandbox', './views/app', './collections/events', 'fullcalendar', 'serverSync'], function(sandbox, AppView, Events, fc, serverSync) {
   'use strict';
 
   return function(options) {
@@ -11,7 +11,14 @@ define(['sandbox', './views/app', './collections/events', 'fullcalendar'], funct
 
     events.fetch();
 
-
+    events.bind('event-added', function() { console.log("GOT event-added callback");});
+    events.bind('event-modified', function() { console.log("GOT event-added callback");});
+    
+    try {
+      new serverSync(Events, events);
+    } catch(e) {
+      console.log("error loading serverSync",e);
+    }
 
     sandbox.emit('bootstrap', 'calendar');
     sandbox.emit('*', 'calendar', 'bubblegum');

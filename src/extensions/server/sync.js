@@ -1,7 +1,10 @@
-define(['sandbox', '../../../widgets/calendar/collections/events', 
+define(['sandbox',
        '../../../widgets/calendar/models/event'], 
-       function(sandbox, Events, Event) {
+       function(sandbox, Event) {
   'use strict';
+
+
+var serverSync = function(Events, eventsCollection) {
 
   function getLocalEvents (callback) {
     var evtCollection = new Events();
@@ -64,7 +67,8 @@ define(['sandbox', '../../../widgets/calendar/collections/events',
 
   sandbox.on("Event::destroy","calendar",function(type, evt) { 
     console.log("Got an event: ",arguments);
-    console.log("Got an event: ",evt.toJSON()); 
+    console.log("Got an event: ",evt.toJSON());
+    storeLSDeletedId(evt.id);
     if ( !navigator.onLine ) {
       console.log("I'm offline, see ya later");
       return ;
@@ -79,10 +83,40 @@ define(['sandbox', '../../../widgets/calendar/collections/events',
       },
       success: function() {
         console.log("Server sync succeded");
+        removeLSDeletedId(evt.id);
       }
     });
   });
 
+  var deletedIdsStorageKey = "events-deleted";
+  function storeLSDeletedId (id) {
+    var keys = getLSDeletedIds();
+    keys.push(id);
+    keysStr = JSON.stringify(keys);
+    localStorage.setItem(deletedIdsStorageKey, keysStr);
+  };
+  
+  function getLSDeletedIds () {
+    var keysStr = localStorage.getItem(deletedIdsStorageKey) || "[]";
+    var keys;
+    try {
+      keys = JSON.parse(keysStr);
+    } catch(e) {
+      keys = [];
+    }
+    return keys;
+  };
+  
+  function removeLSDeletedId(id) {
+    var keys = getLSDeletedIds();
+    var index = keys.indexOf(id);
+    if ( index >= 0 ) {
+      keys.splice(index,1);
+      var keysStr = JSON.stringify(keys);
+      localStorage.setItem(deletedIdsStorageKey, keysStr);
+    }
+  };
+  
   function getServerEventIds (callback) {
     $.ajax({
       type: "GET",
@@ -169,9 +203,13 @@ define(['sandbox', '../../../widgets/calendar/collections/events',
       delete serverEvents[id]._id;
       delete serverEvents[id].__v;
       evt.set(serverEvents[id]);
-      var evtCollection = new Events();
-      evtCollection.create(evt, {
-        success: function(){console.log("Remote => local event saved !",arguments);}
+      eventsCollection.add(evt);
+      eventsCollection._byId[event.id] = event;
+      eventsCollection.trigger('event-added', evt);
+      // should save evt after it belongs to the collection:
+      // the collection brings the sync thing
+      evt.save({}, {
+        success: function() {console.log("evt persisted in localstorage");}
       });
     }
     
@@ -266,8 +304,8 @@ define(['sandbox', '../../../widgets/calendar/collections/events',
   
   
   syncFromServer();
-  
-  return {};
+};
+  return serverSync;
 
 
 });
