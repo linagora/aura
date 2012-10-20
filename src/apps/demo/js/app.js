@@ -12,12 +12,13 @@ if (typeof Object.create !== 'function') {
 define(['core'], function(core) {
   'use strict';
 
-  core.start([{
+  core.start([
+  /*{
     channel: 'todos',
     options: {
       element: '#todoapp'
     }
-  }, {
+  },*/ {
     channel: 'calendar',
     options: {
       element: '#calendarapp'
@@ -27,12 +28,12 @@ define(['core'], function(core) {
     options: {
       element: '#controlsapp'
     }
-  }, {
+  }, /*{
     channel: 'boilerplate',
     options: {
       element: '#boilerplateapp'
     }
-  }, {
+  }, */{
     channel: 'router',
     options: {
       element: '#router'

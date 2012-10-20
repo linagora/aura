@@ -1,4 +1,4 @@
-define(['sandbox', "serverSync"], function(sandbox) {
+define(['sandbox'], function(sandbox) {
   'use strict';
 
   var Event = sandbox.mvc.Model({

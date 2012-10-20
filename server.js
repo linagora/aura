@@ -1,6 +1,11 @@
 var express = require('express');
 var app = express();
 
+app.use(function(req, res, next){
+  console.log('%s %s', req.method, req.url);
+  next();
+});
+
 app.get('/cache.manifest', function(req, res){
   res.set('Content-Type', 'text/html');
   res.sendFile('/cache.manifest');

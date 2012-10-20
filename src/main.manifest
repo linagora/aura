@@ -1,6 +1,13 @@
 CACHE MANIFEST
 CACHE:
 http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/base/jquery-ui.css
+http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/base/images/ui-bg_flat_75_ffffff_40x100.png
+http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png
+http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/base/images/ui-bg_highlight-soft_75_cccccc_1x100.png
+http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/base/images/ui-icons_222222_256x240.png
+http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/base/images/ui-bg_glass_75_e6e6e6_1x400.png
+http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/base/images/ui-bg_glass_75_dadada_1x400.png
+http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/base/images/ui-bg_glass_65_ffffff_1x400.png
 config.js
 i18n.js
 index.html
@@ -29,6 +36,8 @@ index.html
 ./extensions/backbone/lib/text.js
 ./extensions/backbone/sandbox.js
 ./extensions/server/sync.js
+./extensions/server/localChanges.js
+./extensions/server/syncResolver.js
 ./nls/fr-fr/todos.js
 ./nls/todos.js
 ./widgets/boilerplate/main.js
@@ -52,3 +61,9 @@ index.html
 ./widgets/todos/templates/todos.html
 ./widgets/todos/views/app.js
 ./widgets/todos/views/todos.js
+
+
+NETWORK:
+/calendar/events
+/calendar/event
+/calendar/getEvent
