@@ -1,5 +1,11 @@
 'use strict';
 
+if ( !window.console ||  !window.console.log ) {
+  window.console = window.console || {};
+  window.console.log = function() {};
+}
+
+
 require.config({
   // [RequireJS](http://requirejs.org/) 2.0+ plus has error callbacks (errbacks)
   // which provide per-require error handling. To utilize this feature
