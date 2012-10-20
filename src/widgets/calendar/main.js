@@ -15,7 +15,10 @@ define(['sandbox', './views/app', './collections/events', 'fullcalendar', 'serve
     events.bind('event-modified', function() { console.log("GOT event-added callback");});
     
     try {
-      new serverSync(Events, events);
+      var s = new serverSync(Events, events);
+      $(document).ready(function() {
+        $("#syncCalendar").click(function() { s.sync(); });
+      });
     } catch(e) {
       console.log("error loading serverSync",e);
     }

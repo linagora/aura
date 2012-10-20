@@ -95,8 +95,17 @@ var serverSync = function(Events, eventsCollection) {
   };
   
   function getLocalEvents (callback) {
-    var evtCollection = new Events();
-    evtCollection.fetch({
+    var models = eventsCollection.models;
+    if ( !models ) {
+      console.log("fetch error", eventsCollection);
+      return callback(err);
+    }
+    console.log("fetch success",models); 
+    callback(null, models);
+    
+    /*
+//     var evtCollection = new Events();
+    eventsCollection.fetch({
       success: function(col, events) { 
         console.log("fetch success",arguments); 
         callback(null, events);
@@ -106,6 +115,7 @@ var serverSync = function(Events, eventsCollection) {
         callback(err);
       }
     });
+*/
   };
 
   
@@ -140,11 +150,27 @@ var serverSync = function(Events, eventsCollection) {
   };
   
   function compareEvents (ev1, ev2) {
+    var internalEv1 = ( "toJSON" in ev1 ) ? ev1.toJSON() : ev1;
+    var internalEv2 = ( "toJSON" in ev2 ) ? ev2.toJSON() : ev2;
     var properties=["color","end","start","title"];
     var same = true;
     properties.forEach(function(prop) {
-      if ( ev1[prop] != ev2[prop] ) {
-        same = false;
+      if ( prop == "start" || prop == "end" ) {
+        var d1 = internalEv1[prop];
+        var d2 = internalEv2[prop];
+        if ( d1!== null && d1.getDate ) {
+          d1 = $.fullCalendar.formatDate(d1, 'u');
+        }
+        if ( d2 !== null && d2.getDate ) {
+          d2 = $.fullCalendar.formatDate(d2, 'u');
+        }
+        if ( d1 != d2 ) {
+          same = false;
+        }
+      } else {
+        if ( internalEv1[prop] != internalEv2[prop] ) {
+          same = false;
+        }
       }
     });
     return same;
@@ -241,7 +267,14 @@ var serverSync = function(Events, eventsCollection) {
         var changes = resolver.resolve(clientEvents, serverEvents, compareEvents);
         console.log(changes);
         inBatch = true;
-        changes.shouldStore.forEach(function(event) { applyEventLocally(event); });
+        changes.shouldStore.forEach(function(event) { 
+          try {
+            removeEventLocally(event);
+          } catch(e) {
+            console.log("event",event,"doesn't exist");
+          }
+          applyEventLocally(event); 
+        });
         changes.shouldDelete.forEach(function(event) { removeEventLocally(event); });
         changes.shouldSendStore.forEach(function(event) { applyEventRemotely(event); });
         changes.shouldSendDelete.forEach(function(event) { removeEventRemotely(event); });
@@ -250,6 +283,7 @@ var serverSync = function(Events, eventsCollection) {
     };
   };
   
+  this.sync = syncFromServer;
   
   syncFromServer();
 };
