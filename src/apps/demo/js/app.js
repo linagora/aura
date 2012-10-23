@@ -13,12 +13,12 @@ define(['core'], function(core) {
   'use strict';
 
   core.start([
-  /*{
+  {
     channel: 'todos',
     options: {
       element: '#todoapp'
     }
-  },*/ {
+  }, {
     channel: 'calendar',
     options: {
       element: '#calendarapp'
