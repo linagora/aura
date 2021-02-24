@@ -1,3 +1,5 @@
+![Archived](https://img.shields.io/badge/Current_Status-archived-blue?style=flat)
+
 ##Aura 0.8 Developer Preview [![Build Status](https://secure.travis-ci.org/addyosmani/aura.png?branch=master)](http://travis-ci.org/addyosmani/aura)
 
 ![logo](https://github.com/addyosmani/aura/raw/master/media/logo.jpg)
